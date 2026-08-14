@@ -115,7 +115,7 @@ award(points, 2, courtney && /"(?:jobTitle|knowsAbout|sameAs)"/.test(courtney.sc
 
 // Useful answer-shaped content: 15 points
 award(points, 6, clamp(episodePages.length / 10, 1), 'Dedicated episode resources');
-award(points, 3, ratio(episodePages, (page) => page.words >= 250), 'Detailed episode pages');
+award(points, 3, clamp(episodePages.filter((page) => /<section\s+class=["']episode-resources["']/i.test(page.html)).length / 4, 1), 'Publisher resource preservation');
 award(points, 2, ratio(episodePages, (page) => /<section\s+class=["']episode-notes["'][\s\S]*?<(?:ul|ol)\b/i.test(page.html)), 'Structured publisher episode notes');
 award(points, 2, ratio(episodePages, (page) => /<time\b/i.test(page.html) && /<audio\b/i.test(page.html)), 'Episode date and playable audio');
 award(points, 2, episodePages.length ? ratio(okPages, (page) => page.links.some((href) => {
