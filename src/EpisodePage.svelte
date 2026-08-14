@@ -25,7 +25,7 @@
         '@id': `${canonicalUrl}#episode`,
         name: episode.title,
         url: canonicalUrl,
-        description,
+        description: truncate(description, 500),
         datePublished: episode.date,
         duration: isoDuration(episode.duration),
         episodeNumber: episode.episode,
