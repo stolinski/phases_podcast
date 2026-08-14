@@ -24,7 +24,7 @@ export type EpisodeReference = Pick<Episode, 'episode' | 'title'>;
 export type EpisodeDetail = Omit<Episode, 'description'>;
 export type EpisodeListing = Pick<
   Episode,
-  'id' | 'episode' | 'title' | 'description' | 'date' | 'audio' | 'duration'
+  'episode' | 'title' | 'description' | 'date' | 'audio' | 'duration'
 >;
 
 export function episodeDescription(notes: EpisodeNoteBlock[]): string {

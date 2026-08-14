@@ -75,7 +75,7 @@
   }
 
   async function playEpisode(episode: EpisodeListing) {
-    const isNewEpisode = episode.id !== selected.id;
+    const isNewEpisode = episode.episode !== selected.episode;
     selected = episode;
     await tick();
     if (isNewEpisode) audioElement.load();
@@ -192,10 +192,10 @@
 
     {#if filteredEpisodes.length}
       <ol class="episode-list">
-        {#each filteredEpisodes as episode (episode.id)}
-          <li class:active={episode.id === selected.id}>
+        {#each filteredEpisodes as episode (episode.episode)}
+          <li class:active={episode.episode === selected.episode}>
             <button class="episode-play" onclick={() => playEpisode(episode)} aria-label={`Play ${episode.title}`}>
-              {#if episode.id === selected.id && isPlaying}
+              {#if episode.episode === selected.episode && isPlaying}
                 <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="7" y="6" width="3.5" height="12" rx="1"></rect><rect x="13.5" y="6" width="3.5" height="12" rx="1"></rect></svg>
               {:else}
                 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 7 8 5-8 5V7Z" fill="currentColor"></path></svg>

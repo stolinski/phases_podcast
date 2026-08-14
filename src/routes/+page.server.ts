@@ -6,7 +6,6 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ fetch, platform, setHeaders }) => {
   try {
     const episodes: EpisodeListing[] = (await getEpisodes(fetch, platform)).map((episode) => ({
-      id: episode.id,
       episode: episode.episode,
       title: episode.title,
       description: episode.description,
