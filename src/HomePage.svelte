@@ -1,9 +1,9 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { onMount, tick } from 'svelte';
-  import { episodeSlug, type Episode } from './lib/episodes';
+  import { episodeSlug, type EpisodeListing } from './lib/episodes';
 
-  let { episodes }: { episodes: Episode[] } = $props();
+  let { episodes }: { episodes: EpisodeListing[] } = $props();
   let query = $state('');
   let selected = $derived(episodes[0]);
   let isPlaying = $state(false);
@@ -74,7 +74,7 @@
     return `${Math.floor(seconds / 60)} min`;
   }
 
-  async function playEpisode(episode: Episode) {
+  async function playEpisode(episode: EpisodeListing) {
     const isNewEpisode = episode.id !== selected.id;
     selected = episode;
     await tick();

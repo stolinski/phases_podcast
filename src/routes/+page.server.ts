@@ -1,10 +1,19 @@
 import { error } from '@sveltejs/kit';
+import type { EpisodeListing } from '$lib/episodes';
 import { getEpisodes } from '$lib/server/podcast';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch, platform, setHeaders }) => {
   try {
-    const episodes = await getEpisodes(fetch, platform);
+    const episodes: EpisodeListing[] = (await getEpisodes(fetch, platform)).map((episode) => ({
+      id: episode.id,
+      episode: episode.episode,
+      title: episode.title,
+      description: episode.description,
+      date: episode.date,
+      audio: episode.audio,
+      duration: episode.duration
+    }));
     setHeaders({
       'cache-control': 'public, max-age=0, s-maxage=900, stale-while-revalidate=86400'
     });
