@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { episodeSlug } from '$lib/episodes';
+import { episodeSlug, type Episode, type EpisodeReference } from '$lib/episodes';
 import { getEpisodes } from '$lib/server/podcast';
 import type { PageServerLoad } from './$types';
 
@@ -22,7 +22,12 @@ export const load: PageServerLoad = async ({ params, fetch, platform, setHeaders
 
   return {
     episode,
-    newerEpisode: episodes[episodeIndex - 1],
-    olderEpisode: episodes[episodeIndex + 1]
+    newerEpisode: episodeReference(episodes[episodeIndex - 1]),
+    olderEpisode: episodeReference(episodes[episodeIndex + 1])
   };
 };
+
+function episodeReference(episode: Episode | undefined): EpisodeReference | undefined {
+  if (!episode) return undefined;
+  return { episode: episode.episode, title: episode.title };
+}

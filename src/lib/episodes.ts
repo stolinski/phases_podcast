@@ -20,6 +20,8 @@ export type Episode = {
   share: string;
 };
 
+export type EpisodeReference = Pick<Episode, 'episode' | 'title'>;
+
 export function episodeSlug(episode: Pick<Episode, 'episode' | 'title'>): string {
   const title = episode.title
     .normalize('NFKD')

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { episodeSlug, type Episode } from '$lib/episodes';
+  import { episodeSlug, type Episode, type EpisodeReference } from '$lib/episodes';
 
   let {
     episode,
@@ -8,8 +8,8 @@
     olderEpisode
   }: {
     episode: Episode;
-    newerEpisode?: Episode;
-    olderEpisode?: Episode;
+    newerEpisode?: EpisodeReference;
+    olderEpisode?: EpisodeReference;
   } = $props();
 
   const slug = $derived(episodeSlug(episode));
