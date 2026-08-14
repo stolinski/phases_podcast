@@ -3,12 +3,20 @@ import type { EpisodeListing } from '$lib/episodes';
 import { getEpisodes } from '$lib/server/podcast';
 import type { PageServerLoad } from './$types';
 
+function excerpt(description: string, maxLength = 320): string {
+  if (description.length <= maxLength) return description;
+
+  const shortened = description.slice(0, maxLength + 1);
+  const lastSpace = shortened.lastIndexOf(' ');
+  return `${shortened.slice(0, lastSpace > 0 ? lastSpace : maxLength).trimEnd()}…`;
+}
+
 export const load: PageServerLoad = async ({ fetch, platform, setHeaders }) => {
   try {
     const episodes: EpisodeListing[] = (await getEpisodes(fetch, platform)).map((episode) => ({
       episode: episode.episode,
       title: episode.title,
-      description: episode.description,
+      description: excerpt(episode.description),
       date: episode.date,
       audio: episode.audio,
       duration: episode.duration
