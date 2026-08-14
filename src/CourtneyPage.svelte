@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import './courtney.css';
 
   const personSchema = {
     '@context': 'https://schema.org',

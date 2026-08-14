@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import './questions.css';
 
   const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdoDg_K7zlYbv8Rxx4P9bL9B1dcr09ehCIzzVyfc9zbRj1m_Q/viewform';
   const pageSchema = {
