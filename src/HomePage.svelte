@@ -1,17 +1,22 @@
 <script lang="ts">
-  import 'media-chrome';
-  import { tick } from 'svelte';
-  import { episodes, type Episode } from './lib/episodes';
+  import { resolve } from '$app/paths';
+  import { onMount, tick } from 'svelte';
+  import type { Episode } from './lib/episodes';
 
+  let { episodes }: { episodes: Episode[] } = $props();
   let query = $state('');
-  let selected = $state<Episode>(episodes[0]);
+  let selected = $derived(episodes[0]);
   let isPlaying = $state(false);
-  let audioElement: HTMLAudioElement;
+  let audioElement!: HTMLAudioElement;
   let filteredEpisodes = $derived(
     episodes.filter((episode) =>
       `${episode.title} ${episode.description}`.toLowerCase().includes(query.trim().toLowerCase())
     )
   );
+
+  onMount(() => {
+    void import('media-chrome');
+  });
 
   const platforms = [
     { name: 'Apple Podcasts', icon: '/icons/applepodcasts.svg', href: 'https://podcasts.apple.com/podcast/phases-a-parenting-podcast-with-dr-courtney/id1879900591' },
@@ -51,7 +56,7 @@
   <a class="wordmark" href="#top" aria-label="Phases home">phases<span>.fm</span></a>
   <nav aria-label="Primary navigation">
     <a href="#episodes">Episodes</a>
-    <a href="/courtney">Courtney</a>
+    <a href={resolve('/courtney')}>Courtney</a>
     <a class="nav-cta" href="#subscribe">Listen now</a>
   </nav>
 </header>
@@ -167,7 +172,7 @@
       <p class="eyebrow">Meet your hosts</p>
       <h2>Science-backed. Real-life tested.</h2>
       <p>Dr. Courtney Tolinski is a licensed clinical and school psychologist. Her husband Scott is a professional question-asker and fellow parent. Together, they make the science and psychology of parenting and human development useful, honest, and fun.</p>
-      <a class="about-link" href="/courtney">Meet Dr. Courtney <span aria-hidden="true">→</span></a>
+      <a class="about-link" href={resolve('/courtney')}>Meet Dr. Courtney <span aria-hidden="true">→</span></a>
       <p class="signature">Courtney &amp; Scott</p>
     </article>
 
@@ -195,7 +200,7 @@
   <a class="wordmark" href="#top">phases<span>.fm</span></a>
   <p>Parenting changes. You don't have to figure it out alone.</p>
   <div>
-    <a href="/courtney">Courtney</a>
+    <a href={resolve('/courtney')}>Courtney</a>
     <a href="https://www.youtube.com/@phasesfm" target="_blank" rel="noreferrer">YouTube</a>
     <a href="https://feeds.transistor.fm/phases-a-parenting-podcast-with-dr-courtney" target="_blank" rel="noreferrer">RSS</a>
   </div>

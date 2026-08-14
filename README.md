@@ -16,4 +16,6 @@ npm run check
 npm run build
 ```
 
-The current 22-episode catalog is sourced from the official Transistor RSS feed. Podcast destinations and the Kit newsletter form use the official Phases accounts/form.
+Episodes are fetched from the official Transistor RSS feed in the server-only homepage load. Successful responses are cached at the Cloudflare edge for 15 minutes, with a seven-day stale cache used when Transistor is temporarily unavailable. Publishing an episode does not require a source change or rebuild.
+
+Cloudflare Pages configuration lives in `wrangler.toml`; the server-rendered build output is `.svelte-kit/cloudflare`.

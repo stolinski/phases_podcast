@@ -1,4 +1,7 @@
 node_modules
 dist
+.svelte-kit
+.wrangler
+.dex
 .DS_Store
 *.local

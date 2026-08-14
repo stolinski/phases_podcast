@@ -4,19 +4,25 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev",
     "build": "vite build",
-    "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "preview": "wrangler pages dev .svelte-kit/cloudflare",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "prepare": "svelte-kit sync"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260814.1",
+    "@sveltejs/adapter-cloudflare": "^7.2.9",
+    "@sveltejs/kit": "^2.70.2",
     "@sveltejs/vite-plugin-svelte": "latest",
     "svelte": "latest",
     "svelte-check": "latest",
     "typescript": "latest",
-    "vite": "latest"
+    "vite": "latest",
+    "wrangler": "^4.123.0"
   },
   "dependencies": {
+    "fast-xml-parser": "^5.10.1",
     "media-chrome": "latest"
   }
 }
