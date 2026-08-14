@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import './episode.css';
   import { episodeDescription, episodeSlug, type EpisodeDetail, type EpisodeReference } from '$lib/episodes';
 
   let {
