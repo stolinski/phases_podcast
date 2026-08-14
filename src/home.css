@@ -1,3 +1,11 @@
+button, input { font: inherit; }
+button { color: inherit; -webkit-tap-highlight-color: transparent; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.primary-button { min-height: 3.2rem; padding: .8rem 1.25rem; display: inline-flex; align-items: center; gap: .55rem; border: 0; border-radius: 999px; background: var(--blue); box-shadow: 0 8px 24px rgba(39, 133, 183, .2); color: white; cursor: pointer; font-size: .92rem; font-weight: 600; transition: transform 180ms cubic-bezier(.2,.8,.2,1), background-color 180ms ease; }
+.primary-button svg { width: 1.2rem; }
+.primary-button:hover { background: var(--deep-blue); transform: translateY(-2px); }
+.primary-button:active { transform: translateY(0) scale(.98); }
+
 .hero { min-height: 39rem; padding: 5rem 0 4.5rem; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(20rem, .78fr); align-items: center; gap: clamp(3rem, 8vw, 8rem); }
 .hero-copy { max-width: 43rem; }
 h1 em { color: var(--blue); font-style: normal; }

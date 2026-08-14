@@ -1,3 +1,10 @@
+.primary-button { min-height: 3.2rem; padding: .8rem 1.25rem; display: inline-flex; align-items: center; gap: .55rem; border: 0; border-radius: 999px; background: var(--blue); box-shadow: 0 8px 24px rgba(39, 133, 183, .2); color: white; cursor: pointer; font-size: .92rem; font-weight: 600; transition: transform 180ms cubic-bezier(.2,.8,.2,1), background-color 180ms ease; }
+.primary-button svg { width: 1.2rem; }
+.primary-button:hover { background: var(--deep-blue); transform: translateY(-2px); }
+.primary-button:active { transform: translateY(0) scale(.98); }
+.back-link { margin-bottom: 3.5rem; display: inline-flex; align-items: center; gap: .5rem; color: var(--muted); font-size: .75rem; font-weight: 600; text-decoration: none; }
+.back-link:hover { color: var(--blue); }
+
 .bio-main { width: min(100% - 2.5rem, 1200px); }
 .courtney-hero { min-height: calc(100vh - 5.5rem); padding: 5rem 0 6rem; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(24rem, .85fr); align-items: center; gap: clamp(4rem, 9vw, 8rem); }
 .courtney-copy { max-width: 43rem; }
