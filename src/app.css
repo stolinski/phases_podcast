@@ -248,6 +248,11 @@ h1 em { color: var(--blue); font-style: normal; }
 .episode-note-body li + li { margin-top: .55rem; }
 .episode-notes .episode-source { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: .78rem; }
 .episode-source a { color: var(--deep-blue); font-weight: 600; text-underline-offset: .25em; }
+.episode-resources { margin-top: 4rem; padding: clamp(1.75rem, 4vw, 3rem); border-radius: 1.5rem; background: var(--cream); }
+.episode-resources h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); }
+.episode-resources > p:not(.eyebrow) { max-width: 40rem; margin: 1rem 0 0; color: var(--muted); font-size: .82rem; line-height: 1.65; }
+.episode-resources ul { margin: 1.75rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem 2rem; list-style: none; }
+.episode-resources a { color: var(--deep-blue); font-size: .88rem; font-weight: 600; line-height: 1.45; text-underline-offset: .25em; }
 .episode-pagination { margin-top: 5rem; padding-top: 2rem; display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--line); }
 .episode-pagination a { width: min(48%, 28rem); padding: 1.25rem; display: flex; flex-direction: column; gap: .45rem; border: 1px solid var(--line); border-radius: 1rem; color: var(--ink); text-decoration: none; }
 .episode-pagination a:last-child { margin-left: auto; text-align: right; }
@@ -338,7 +343,9 @@ footer small { font-size: .7rem; }
   .episode-hero { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 2.5rem; }
   .episode-hero > img { width: min(72%, 18rem); margin-inline: auto; }
   .episode-copy h1 { font-size: clamp(2.5rem, 11.5vw, 3.25rem); }
-  .episode-player, .episode-notes, .episode-pagination, .episode-about { margin-top: 3.5rem; }
+  .episode-player, .episode-notes, .episode-resources, .episode-pagination, .episode-about { margin-top: 3.5rem; }
+  .episode-resources { padding: 2rem 1.5rem; }
+  .episode-resources ul { grid-template-columns: 1fr; }
   .episode-pagination { flex-direction: column; }
   .episode-pagination a { width: 100%; }
   .episode-pagination a:last-child { text-align: left; }

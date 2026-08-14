@@ -152,6 +152,19 @@
       <p class="episode-source">These notes come from the official Phases podcast feed. <a href={episode.share} target="_blank" rel="noreferrer">View the publisher’s original episode page <span aria-hidden="true">↗</span></a></p>
     </section>
 
+    {#if episode.resources.length}
+      <section class="episode-resources" aria-labelledby="resources-title">
+        <p class="eyebrow">From the show notes</p>
+        <h2 id="resources-title">Resources mentioned in this episode</h2>
+        <p>These links come directly from the official episode notes. Retailer links may be affiliate links.</p>
+        <ul>
+          {#each episode.resources as resource (resource.url)}
+            <li><a href={resource.url} target="_blank" rel="noreferrer">{resource.label} <span aria-hidden="true">↗</span></a></li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
+
     {#if newerEpisode || olderEpisode}
       <nav class="episode-pagination" aria-label="More Phases episodes">
         {#if newerEpisode}

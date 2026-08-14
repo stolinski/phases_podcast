@@ -2,12 +2,18 @@ export type EpisodeNoteBlock =
   | { type: 'paragraph'; text: string }
   | { type: 'list'; items: string[] };
 
+export type EpisodeResource = {
+  label: string;
+  url: string;
+};
+
 export type Episode = {
   id: string;
   episode: number;
   title: string;
   description: string;
   notes: EpisodeNoteBlock[];
+  resources: EpisodeResource[];
   date: string;
   audio: string;
   duration: number;

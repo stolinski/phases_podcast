@@ -1,9 +1,9 @@
 import { XMLParser } from 'fast-xml-parser';
-import type { Episode, EpisodeNoteBlock } from '$lib/episodes';
+import type { Episode, EpisodeNoteBlock, EpisodeResource } from '$lib/episodes';
 
 const FEED_URL = 'https://feeds.transistor.fm/phases-a-parenting-podcast-with-dr-courtney';
-const FRESH_CACHE_KEY = 'https://phases.fm/__cache/podcast-episodes-v2';
-const STALE_CACHE_KEY = 'https://phases.fm/__cache/podcast-episodes-stale-v2';
+const FRESH_CACHE_KEY = 'https://phases.fm/__cache/podcast-episodes-v3';
+const STALE_CACHE_KEY = 'https://phases.fm/__cache/podcast-episodes-stale-v3';
 const FRESH_TTL_SECONDS = 15 * 60;
 const STALE_TTL_SECONDS = 7 * 24 * 60 * 60;
 
@@ -88,6 +88,32 @@ function plainText(notes: EpisodeNoteBlock[]): string {
     .trim();
 }
 
+function episodeResources(value: unknown): EpisodeResource[] {
+  const resources: EpisodeResource[] = [];
+  const seen = new Set<string>();
+
+  for (const match of text(value).matchAll(/<a\s+[^>]*href=(["'])(.*?)\1[^>]*>([\s\S]*?)<\/a>/gi)) {
+    const rawUrl = decodeEntities(match[2]).trim();
+    let url: URL;
+    try { url = new URL(rawUrl); } catch { continue; }
+    if (url.protocol !== 'https:' || url.hostname === 'phases.fm' || url.hostname === 'www.phases.fm') continue;
+
+    let label = cleanText(match[3]);
+    if (!label || /^(?:ask us |leave it |submit it )?here$/i.test(label)) continue;
+    if (/^https?:\/\//i.test(label)) {
+      if (url.hostname === 'amzn.to') continue;
+      label = url.hostname.replace(/^www\./, '');
+    }
+
+    const key = url.href;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    resources.push({ label, url: url.href });
+  }
+
+  return resources;
+}
+
 function durationInSeconds(value: unknown): number {
   const duration = text(value);
   if (/^\d+$/.test(duration)) return Number(duration);
@@ -110,6 +136,7 @@ export function parseEpisodes(xml: string): Episode[] {
     const enclosure = item.enclosure as Record<string, unknown> | undefined;
     const date = new Date(text(item.pubDate));
     const notes = episodeNotes(item.description);
+    const resources = episodeResources(item.description);
 
     return {
       id: text(item.guid),
@@ -117,6 +144,7 @@ export function parseEpisodes(xml: string): Episode[] {
       title: text(item['itunes:title'] ?? item.title).trim(),
       description: plainText(notes),
       notes,
+      resources,
       date: date.toISOString(),
       audio: text(enclosure?.['@_url']),
       duration: durationInSeconds(item['itunes:duration']),
