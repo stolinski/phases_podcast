@@ -1,7 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { onMount, tick } from 'svelte';
-  import type { Episode } from './lib/episodes';
+  import { episodeSlug, type Episode } from './lib/episodes';
 
   let { episodes }: { episodes: Episode[] } = $props();
   let query = $state('');
@@ -141,7 +141,7 @@
           <h2 id="now-playing-title">{selected.title}</h2>
         </div>
       </div>
-      <a class="player-notes" href={selected.share} target="_blank" rel="noreferrer">Episode notes <span aria-hidden="true">↗</span></a>
+      <a class="player-notes" href={resolve('/episodes/[slug]', { slug: episodeSlug(selected) })}>Episode notes <span aria-hidden="true">→</span></a>
     </div>
 
     <media-controller audio class="media-player">
@@ -203,9 +203,9 @@
             </button>
             <article>
               <div class="episode-meta"><span>Episode {episode.episode}</span><time datetime={episode.date}>{formatDate(episode.date)}</time><span>{formatDuration(episode.duration)}</span></div>
-              <h3><button onclick={() => playEpisode(episode)}>{episode.title}</button></h3>
+              <h3><a href={resolve('/episodes/[slug]', { slug: episodeSlug(episode) })}>{episode.title}</a></h3>
               <p>{episode.description}</p>
-              <a href={episode.share} target="_blank" rel="noreferrer">Episode notes <span aria-hidden="true">↗</span></a>
+              <a href={resolve('/episodes/[slug]', { slug: episodeSlug(episode) })}>Episode notes <span aria-hidden="true">→</span></a>
             </article>
           </li>
         {/each}

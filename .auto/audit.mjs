@@ -118,7 +118,9 @@ award(points, 6, clamp(episodePages.length / 10, 1), 'Dedicated episode resource
 award(points, 3, ratio(episodePages, (page) => page.words >= 250), 'Detailed episode pages');
 award(points, 2, ratio(episodePages, (page) => page.h1s.some((heading) => /\?|why|how|what|when|reason/i.test(heading))), 'Question/answer-oriented episode headings');
 award(points, 2, ratio(episodePages, (page) => /<time\b/i.test(page.html) && /<audio\b/i.test(page.html)), 'Episode date and playable audio');
-award(points, 2, episodePages.length ? ratio(okPages, (page) => page.links.some((href) => href.startsWith('/episodes/'))) : 0, 'Internal episode linking');
+award(points, 2, episodePages.length ? ratio(okPages, (page) => page.links.some((href) => {
+  try { return new URL(href, canonicalOrigin).pathname.startsWith('/episodes/'); } catch { return false; }
+})) : 0, 'Internal episode linking');
 
 const score = Math.round(points.value * 100) / 100;
 const sortedTimes = [...responseTimes].sort((a, b) => a - b);
