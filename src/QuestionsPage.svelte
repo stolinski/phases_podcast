@@ -2,6 +2,27 @@
   import { resolve } from '$app/paths';
 
   const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdoDg_K7zlYbv8Rxx4P9bL9B1dcr09ehCIzzVyfc9zbRj1m_Q/viewform';
+  const pageSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ContactPage',
+        '@id': 'https://phases.fm/questions#page',
+        name: 'Ask Dr. Courtney',
+        url: 'https://phases.fm/questions',
+        description: 'Submit a parenting, child development, learning, or neurodiversity question for a future episode of Phases.',
+        isPartOf: { '@id': 'https://phases.fm/#website' },
+        about: { '@id': 'https://phases.fm/#podcast' }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Phases', item: 'https://phases.fm' },
+          { '@type': 'ListItem', position: 2, name: 'Ask Dr. Courtney', item: 'https://phases.fm/questions' }
+        ]
+      }
+    ]
+  };
 
   function preventFormFocusScroll(event: Event) {
     const frame = event.currentTarget as HTMLIFrameElement;
@@ -25,6 +46,7 @@
   <meta name="twitter:title" content="Ask Dr. Courtney Your Parenting Question — Phases" />
   <meta name="twitter:description" content="Send Dr. Courtney your parenting or child development question for a future episode." />
   <meta name="twitter:image" content="https://phases.fm/artwork.jpg" />
+  {@html '<script type="application/ld+json">' + JSON.stringify(pageSchema).replace(/</g, '\\u003c') + '</' + 'script>'}
 </svelte:head>
 
 <header class="site-header questions-header">

@@ -18,6 +18,43 @@
     void import('media-chrome');
   });
 
+  const siteSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': 'https://phases.fm/#organization',
+        name: 'Phases',
+        url: 'https://phases.fm',
+        logo: 'https://phases.fm/artwork.jpg',
+        sameAs: [
+          'https://podcasts.apple.com/podcast/phases-a-parenting-podcast-with-dr-courtney/id1879900591',
+          'https://open.spotify.com/show/0K4GkKLtEQHfDvxHcCUmnU',
+          'https://www.youtube.com/@phasesfm'
+        ]
+      },
+      {
+        '@type': 'WebSite',
+        '@id': 'https://phases.fm/#website',
+        name: 'Phases',
+        url: 'https://phases.fm',
+        publisher: { '@id': 'https://phases.fm/#organization' },
+        inLanguage: 'en-US'
+      },
+      {
+        '@type': 'PodcastSeries',
+        '@id': 'https://phases.fm/#podcast',
+        name: 'Phases — A Parenting Podcast with Dr. Courtney',
+        url: 'https://phases.fm',
+        description: 'Research-backed parenting conversations with psychologist Dr. Courtney Tolinski and Scott Tolinski.',
+        image: 'https://phases.fm/artwork.jpg',
+        webFeed: 'https://feeds.transistor.fm/phases-a-parenting-podcast-with-dr-courtney',
+        author: { '@id': 'https://phases.fm/#organization' },
+        inLanguage: 'en-US'
+      }
+    ]
+  };
+
   const platforms = [
     { name: 'Apple Podcasts', icon: '/icons/applepodcasts.svg', href: 'https://podcasts.apple.com/podcast/phases-a-parenting-podcast-with-dr-courtney/id1879900591' },
     { name: 'Spotify', icon: '/icons/spotify.svg', href: 'https://open.spotify.com/show/0K4GkKLtEQHfDvxHcCUmnU' },
@@ -59,6 +96,7 @@
   <meta name="twitter:title" content="Phases — A Parenting Podcast with Dr. Courtney Tolinski" />
   <meta name="twitter:description" content="Research-backed parenting conversations for every stage of family life." />
   <meta name="twitter:image" content="https://phases.fm/artwork.jpg" />
+  {@html '<script type="application/ld+json">' + JSON.stringify(siteSchema).replace(/</g, '\\u003c') + '</' + 'script>'}
 </svelte:head>
 
 <header class="site-header">

@@ -1,5 +1,34 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
+
+  const personSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Person',
+        '@id': 'https://phases.fm/courtney#person',
+        name: 'Dr. Courtney Tolinski',
+        url: 'https://phases.fm/courtney',
+        image: 'https://phases.fm/family.jpg',
+        jobTitle: ['Licensed Psychologist', 'Nationally Certified School Psychologist', 'Podcast Host'],
+        description: 'Licensed psychologist and nationally certified school psychologist with more than 15 years of experience across school, clinical, and community settings.',
+        knowsAbout: ['child psychology', 'school psychology', 'child development', 'neurodiversity', 'parenting'],
+        worksFor: { '@id': 'https://phases.fm/#organization' },
+        hasCredential: [
+          { '@type': 'EducationalOccupationalCredential', name: 'PhD' },
+          { '@type': 'EducationalOccupationalCredential', name: 'Licensed Psychologist (LP)' },
+          { '@type': 'EducationalOccupationalCredential', name: 'Nationally Certified School Psychologist (NCSP)' }
+        ]
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Phases', item: 'https://phases.fm' },
+          { '@type': 'ListItem', position: 2, name: 'Dr. Courtney Tolinski', item: 'https://phases.fm/courtney' }
+        ]
+      }
+    ]
+  };
 </script>
 
 <svelte:head>
@@ -15,6 +44,7 @@
   <meta name="twitter:title" content="Dr. Courtney Tolinski, Psychologist and Phases Host" />
   <meta name="twitter:description" content="Meet the licensed psychologist and nationally certified school psychologist who co-hosts Phases." />
   <meta name="twitter:image" content="https://phases.fm/family.jpg" />
+  {@html '<script type="application/ld+json">' + JSON.stringify(personSchema).replace(/</g, '\\u003c') + '</' + 'script>'}
 </svelte:head>
 
 <header class="site-header bio-header">
