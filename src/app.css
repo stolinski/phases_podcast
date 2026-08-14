@@ -10,9 +10,7 @@
   --cream: #fbfaf6;
   --blue: #2785b7;
   --deep-blue: #0f5275;
-  --sky: #b9d6dc;
   --line: rgba(23, 50, 70, 0.15);
-  --radius: 1.25rem;
   scroll-behavior: smooth;
 }
 
@@ -46,9 +44,6 @@ h1 { margin: 0; font-family: 'Manrope', sans-serif; font-size: clamp(3.4rem, 7vw
 
 .text-link { text-underline-offset: .3em; font-size: .9rem; font-weight: 600; }
 
-.episode-meta { grid-column: 1 / -1; margin-bottom: .6rem; display: flex; align-items: center; gap: .65rem; color: var(--muted); font-size: .68rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
-.episode-meta > * + *::before { content: '•'; margin-right: .65rem; color: #9bacb6; }
-
 footer { min-height: 9rem; display: grid; grid-template-columns: 1fr 2fr auto auto; align-items: center; gap: 2rem; border-top: 1px solid var(--line); color: var(--muted); }
 footer p { margin: 0; font-size: .82rem; }
 footer > div { display: flex; gap: 1rem; }
@@ -67,8 +62,6 @@ footer small { font-size: .7rem; }
   .site-header nav { gap: .9rem; }
   .site-header nav a:not(.nav-cta) { display: none; }
   main, footer { width: min(100% - 1.5rem, 1200px); }
-  .episode-meta { flex-wrap: wrap; gap: .4rem; }
-  .episode-meta > * + *::before { margin-right: .4rem; }
   footer { grid-template-columns: 1fr auto; gap: 1rem; }
   footer small { grid-column: 2; grid-row: 1; }
   footer > div { grid-column: 1 / -1; }

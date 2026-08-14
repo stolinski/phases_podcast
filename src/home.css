@@ -1,3 +1,6 @@
+.episode-meta { grid-column: 1 / -1; margin-bottom: .6rem; display: flex; align-items: center; gap: .65rem; color: var(--muted); font-size: .68rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.episode-meta > * + *::before { content: '•'; margin-right: .65rem; color: #9bacb6; }
+
 button, input { font: inherit; }
 button { color: inherit; -webkit-tap-highlight-color: transparent; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
@@ -106,7 +109,7 @@ h1 em { color: var(--blue); font-style: normal; }
 .episode-list article > p { grid-column: 1; margin: .7rem 0 0; display: -webkit-box; overflow: hidden; color: var(--muted); font-size: .88rem; line-height: 1.65; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .episode-list article > a { grid-column: 2; grid-row: 2 / 4; align-self: center; color: var(--deep-blue); font-size: .75rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .episode-list article > a:hover { text-decoration: underline; text-underline-offset: .25em; }
-.empty-state { padding: 4rem; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--muted); text-align: center; }
+.empty-state { padding: 4rem; border: 1px dashed var(--line); border-radius: 1.25rem; color: var(--muted); text-align: center; }
 .about-newsletter { margin-bottom: 7rem; display: grid; grid-template-columns: 1fr 1fr; border-radius: 1.75rem; overflow: hidden; box-shadow: 0 22px 60px rgba(23, 50, 70, .1); }
 .about-card, .newsletter { min-height: 31rem; padding: clamp(2.5rem, 6vw, 5rem); }
 .about-card { background: var(--cream); }
@@ -160,6 +163,8 @@ h1 em { color: var(--blue); font-style: normal; }
   .episode-play { width: 2.35rem; height: 2.35rem; }
   .episode-list article { display: block; }
   .episode-list article > a { display: inline-block; margin-top: .8rem; }
+  .episode-meta { flex-wrap: wrap; gap: .4rem; }
+  .episode-meta > * + *::before { margin-right: .4rem; }
   .about-newsletter { margin-bottom: 4rem; border-radius: 1.25rem; }
   .about-card, .newsletter { padding: 2.2rem 1.5rem; }
   .newsletter .formkit-fields { flex-direction: column !important; }

@@ -1,4 +1,7 @@
 /* Episode detail */
+.episode-meta { grid-column: 1 / -1; margin-bottom: .6rem; display: flex; align-items: center; gap: .65rem; color: var(--muted); font-size: .68rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.episode-meta > * + *::before { content: '•'; margin-right: .65rem; color: #9bacb6; }
+
 .episode-main { width: min(100% - 2.5rem, 1040px); padding: 3.5rem 0 7rem; }
 .episode-breadcrumbs { display: flex; align-items: center; gap: .65rem; color: var(--muted); font-size: .72rem; }
 .episode-breadcrumbs a { color: var(--deep-blue); text-underline-offset: .25em; }
@@ -56,4 +59,6 @@
   .episode-pagination a { width: 100%; }
   .episode-pagination a:last-child { text-align: left; }
   .episode-about { padding: 2rem 1.5rem; }
+  .episode-meta { flex-wrap: wrap; gap: .4rem; }
+  .episode-meta > * + *::before { margin-right: .4rem; }
 }
