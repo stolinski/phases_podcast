@@ -11,6 +11,7 @@
   <nav aria-label="Primary navigation">
     <a href="/">Home</a>
     <a href="/#episodes">Episodes</a>
+    <a href="/questions">Ask a question</a>
     <a class="nav-cta" href="/#subscribe">Listen now</a>
   </nav>
 </header>
@@ -32,7 +33,7 @@
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 7 8 5-8 5V7Z" fill="currentColor" /></svg>
           Listen to Phases
         </a>
-        <a class="text-link" href="/#subscribe">Get the free toolkit <span aria-hidden="true">↗</span></a>
+        <a class="text-link" href="/questions">Ask Dr. Courtney a question <span aria-hidden="true">→</span></a>
       </div>
     </div>
 
@@ -65,6 +66,7 @@
   <p>Parenting changes. You don't have to figure it out alone.</p>
   <div>
     <a href="/#episodes">Episodes</a>
+    <a href="/questions">Questions</a>
     <a href="/#subscribe">Newsletter</a>
   </div>
   <small>© {new Date().getFullYear()} Phases</small>

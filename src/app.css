@@ -208,6 +208,18 @@ h1 em { color: var(--blue); font-style: normal; }
 .bio-values strong { color: var(--blue); font-family: 'Manrope', sans-serif; font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 300; letter-spacing: -.05em; }
 .bio-values span { max-width: 16rem; color: var(--muted); font-size: .78rem; line-height: 1.55; }
 
+/* Questions */
+.questions-main { padding: 5rem 0 7rem; display: grid; grid-template-columns: minmax(18rem, .72fr) minmax(30rem, 1fr); align-items: start; gap: clamp(3rem, 8vw, 7rem); }
+.questions-intro { position: sticky; top: 3rem; }
+.questions-intro .back-link { margin-bottom: 4rem; }
+.questions-intro h1 { font-size: clamp(3.5rem, 6vw, 6rem); }
+.questions-intro h1 span { display: block; }
+.questions-intro > p:last-child { max-width: 34rem; margin: 1.75rem 0 0; color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+.question-form { padding: 1rem; overflow: hidden; border: 1px solid var(--line); border-radius: 1.5rem; background: var(--cream); box-shadow: 0 20px 55px rgba(23,50,70,.09); }
+.question-form iframe { display: block; width: 100%; min-height: 39.3125rem; border: 0; border-radius: .75rem; background: white; }
+.question-form > p { margin: .9rem .5rem .15rem; color: var(--muted); font-size: .72rem; text-align: center; }
+.question-form > p a { color: var(--deep-blue); font-weight: 600; text-underline-offset: .25em; }
+
 footer { min-height: 9rem; display: grid; grid-template-columns: 1fr 2fr auto auto; align-items: center; gap: 2rem; border-top: 1px solid var(--line); color: var(--muted); }
 footer p { margin: 0; font-size: .82rem; }
 footer > div { display: flex; gap: 1rem; }
@@ -217,6 +229,9 @@ footer small { font-size: .7rem; }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
 
 @media (max-width: 900px) {
+  .questions-main { grid-template-columns: 1fr; }
+  .questions-intro { position: static; max-width: 42rem; }
+  .questions-intro .back-link { margin-bottom: 3rem; }
   .hero { grid-template-columns: 1fr minmax(16rem, .65fr); gap: 3rem; }
   .player-panel { grid-template-columns: 1fr; gap: .8rem; }
   .subscribe { grid-template-columns: 1fr; gap: 2rem; }
@@ -228,6 +243,12 @@ footer small { font-size: .7rem; }
 }
 
 @media (max-width: 680px) {
+  .questions-main { padding: 3.5rem 0 4rem; gap: 2.5rem; }
+  .questions-intro h1 { font-size: clamp(2.9rem, 13vw, 3.5rem); }
+  .question-form { margin-inline: -.25rem; padding: .25rem; border-radius: 1rem; }
+  .question-form iframe { min-height: 42rem; }
+  .question-form > p { margin: 1rem .75rem .75rem; }
+  .questions-header nav { display: none; }
   .site-header { width: min(100% - 1.5rem, 1200px); min-height: 4.5rem; }
   .site-header nav { gap: .9rem; }
   .site-header nav a:not(.nav-cta) { display: none; }

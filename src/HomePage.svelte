@@ -57,6 +57,7 @@
   <nav aria-label="Primary navigation">
     <a href="#episodes">Episodes</a>
     <a href={resolve('/courtney')}>Courtney</a>
+    <a href={resolve('/questions')}>Ask a question</a>
     <a class="nav-cta" href="#subscribe">Listen now</a>
   </nav>
 </header>
@@ -201,6 +202,7 @@
   <p>Parenting changes. You don't have to figure it out alone.</p>
   <div>
     <a href={resolve('/courtney')}>Courtney</a>
+    <a href={resolve('/questions')}>Questions</a>
     <a href="https://www.youtube.com/@phasesfm" target="_blank" rel="noreferrer">YouTube</a>
     <a href="https://feeds.transistor.fm/phases-a-parenting-podcast-with-dr-courtney" target="_blank" rel="noreferrer">RSS</a>
   </div>
