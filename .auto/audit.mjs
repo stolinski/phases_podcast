@@ -75,6 +75,11 @@ const descriptions = okPages.map((page) => page.description);
 const allTypes = (page) => page.schemas.flatMap(types);
 const episodePages = okPages.filter((page) => page.path.startsWith('/episodes/'));
 const innerPages = okPages.filter((page) => page.path !== '/');
+const hasStructuredEpisodeNotes = (page) => {
+  const body = page.html.match(/<div\s+class=["']episode-note-body["'][^>]*>([\s\S]*?)<\/div>/i)?.[1] ?? '';
+  const blockCount = [...body.matchAll(/<(?:p|ul|ol)\b/gi)].length;
+  return /<(?:ul|ol)\b/i.test(body) || blockCount >= 2;
+};
 
 // Page quality: 30 points
 award(points, 2, ratio(pages, (page) => page.status === 200), 'Successful crawl');
@@ -116,7 +121,7 @@ award(points, 2, courtney && /"(?:jobTitle|knowsAbout|sameAs)"/.test(courtney.sc
 // Useful answer-shaped content: 15 points
 award(points, 6, clamp(episodePages.length / 10, 1), 'Dedicated episode resources');
 award(points, 3, clamp(episodePages.filter((page) => /<section\s+class=["']episode-resources["']/i.test(page.html)).length / 4, 1), 'Publisher resource preservation');
-award(points, 2, ratio(episodePages, (page) => /<section\s+class=["']episode-notes["'][\s\S]*?<(?:ul|ol)\b/i.test(page.html)), 'Structured publisher episode notes');
+award(points, 2, ratio(episodePages, hasStructuredEpisodeNotes), 'Structured publisher episode notes');
 award(points, 2, ratio(episodePages, (page) => /<time\b/i.test(page.html) && /<audio\b/i.test(page.html)), 'Episode date and playable audio');
 award(points, 2, episodePages.length ? ratio(okPages, (page) => page.links.some((href) => {
   try { return new URL(href, canonicalOrigin).pathname.startsWith('/episodes/'); } catch { return false; }
