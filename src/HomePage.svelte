@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import './home.css';
   import { onMount, tick } from 'svelte';
   import { episodeSlug, type EpisodeListing } from './lib/episodes';
 
