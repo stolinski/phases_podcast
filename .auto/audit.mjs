@@ -137,13 +137,17 @@ for (const finding of findings) console.log(`AUDIT ${finding}`);
 
 if (process.env.PLAUSIBLE_API_KEY) {
   try {
-    const response = await fetch('https://analytics.tolin.ski/api/v2/query', {
-      method: 'POST',
-      headers: { authorization: `Bearer ${process.env.PLAUSIBLE_API_KEY}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ site_id: 'phases.fm', metrics: ['visitors'], date_range: '30d' })
+    const params = new URLSearchParams({
+      site_id: 'phases.fm',
+      period: '30d',
+      metrics: 'visitors'
     });
+    const response = await fetch(`https://analytics.tolin.ski/api/v1/stats/aggregate?${params}`, {
+      headers: { authorization: `Bearer ${process.env.PLAUSIBLE_API_KEY}` }
+    });
+    if (!response.ok) throw new Error(`API returned ${response.status}`);
     const data = await response.json();
-    const visitors = data?.results?.[0]?.metrics?.[0];
+    const visitors = data?.results?.visitors?.value;
     if (Number.isFinite(visitors)) console.log(`METRIC plausible_visitors_30d=${visitors}`);
   } catch (error) {
     console.error(`AUDIT Plausible metric unavailable: ${error.message}`);
