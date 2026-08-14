@@ -136,7 +136,19 @@
     <section class="episode-notes" aria-labelledby="notes-title">
       <p class="eyebrow">Episode summary</p>
       <h2 id="notes-title">What this conversation covers</h2>
-      <p>{episode.description}</p>
+      <div class="episode-note-body">
+        {#each episode.notes as block (block)}
+          {#if block.type === 'paragraph'}
+            <p>{block.text}</p>
+          {:else}
+            <ul>
+              {#each block.items as item (item)}
+                <li>{item}</li>
+              {/each}
+            </ul>
+          {/if}
+        {/each}
+      </div>
       <p class="episode-source">These notes come from the official Phases podcast feed. <a href={episode.share} target="_blank" rel="noreferrer">View the publisher’s original episode page <span aria-hidden="true">↗</span></a></p>
     </section>
 

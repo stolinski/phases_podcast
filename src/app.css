@@ -237,7 +237,11 @@ h1 em { color: var(--blue); font-style: normal; }
 .episode-player audio { display: block; width: 100%; }
 .episode-notes { max-width: 47rem; margin-top: 5rem; }
 .episode-notes h2 { font-size: clamp(2rem, 4vw, 3.1rem); }
-.episode-notes > p:not(.eyebrow) { color: #526977; font-size: 1rem; line-height: 1.85; }
+.episode-note-body { color: #526977; font-size: 1rem; line-height: 1.85; }
+.episode-note-body p { margin: 1rem 0 0; }
+.episode-note-body ul { margin: 1.25rem 0 0; padding-left: 1.25rem; }
+.episode-note-body li { padding-left: .35rem; }
+.episode-note-body li + li { margin-top: .55rem; }
 .episode-notes .episode-source { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: .78rem; }
 .episode-source a { color: var(--deep-blue); font-weight: 600; text-underline-offset: .25em; }
 .episode-pagination { margin-top: 5rem; padding-top: 2rem; display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--line); }

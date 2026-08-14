@@ -1,8 +1,13 @@
+export type EpisodeNoteBlock =
+  | { type: 'paragraph'; text: string }
+  | { type: 'list'; items: string[] };
+
 export type Episode = {
   id: string;
   episode: number;
   title: string;
   description: string;
+  notes: EpisodeNoteBlock[];
   date: string;
   audio: string;
   duration: number;
