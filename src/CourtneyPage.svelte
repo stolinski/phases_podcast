@@ -1,25 +1,36 @@
+<script lang="ts">
+  import { resolve } from '$app/paths';
+</script>
+
 <svelte:head>
-  <title>Dr. Courtney Tolinski — Phases</title>
-  <meta name="description" content="Meet Dr. Courtney Tolinski, licensed psychologist, nationally certified school psychologist, mom of two, and co-host of Phases." />
-  <meta property="og:title" content="Dr. Courtney Tolinski — Phases" />
+  <title>Dr. Courtney Tolinski, Psychologist and Phases Host</title>
+  <meta name="description" content="Meet Dr. Courtney Tolinski, a licensed psychologist and nationally certified school psychologist with 15+ years of experience supporting children and families." />
+  <link rel="canonical" href="https://phases.fm/courtney" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:url" content="https://phases.fm/courtney" />
+  <meta property="og:title" content="Dr. Courtney Tolinski, Psychologist and Phases Host" />
   <meta property="og:description" content="Licensed psychologist, nationally certified school psychologist, mom of two, and co-host of Phases." />
   <meta property="og:image" content="https://phases.fm/family.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Dr. Courtney Tolinski, Psychologist and Phases Host" />
+  <meta name="twitter:description" content="Meet the licensed psychologist and nationally certified school psychologist who co-hosts Phases." />
+  <meta name="twitter:image" content="https://phases.fm/family.jpg" />
 </svelte:head>
 
 <header class="site-header bio-header">
-  <a class="wordmark" href="/" aria-label="Phases home">phases<span>.fm</span></a>
+  <a class="wordmark" href={resolve('/')} aria-label="Phases home">phases<span>.fm</span></a>
   <nav aria-label="Primary navigation">
-    <a href="/">Home</a>
-    <a href="/#episodes">Episodes</a>
-    <a href="/questions">Ask a question</a>
-    <a class="nav-cta" href="/#subscribe">Listen now</a>
+    <a href={resolve('/')}>Home</a>
+    <a href={resolve('/#episodes')}>Episodes</a>
+    <a href={resolve('/questions')}>Ask a question</a>
+    <a class="nav-cta" href={resolve('/#subscribe')}>Listen now</a>
   </nav>
 </header>
 
 <main class="bio-main">
   <section class="courtney-hero" aria-labelledby="courtney-title">
     <div class="courtney-copy">
-      <a class="back-link" href="/"><span aria-hidden="true">←</span> Back to Phases</a>
+      <a class="back-link" href={resolve('/')}><span aria-hidden="true">←</span> Back to Phases</a>
       <p class="eyebrow">About your host</p>
       <h1 id="courtney-title">Dr. Courtney Tolinski</h1>
       <p class="courtney-lede">Licensed psychologist, nationally certified school psychologist, and mom of two.</p>
@@ -29,11 +40,11 @@
         <p>She currently co-hosts the podcast Phases.FM with her husband, professional podcaster Scott Tolinski, where they share insights on child psychology and the everyday challenges and joys of parenting.</p>
       </div>
       <div class="courtney-actions">
-        <a class="primary-button" href="/#episodes">
+        <a class="primary-button" href={resolve('/#episodes')}>
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 7 8 5-8 5V7Z" fill="currentColor" /></svg>
           Listen to Phases
         </a>
-        <a class="text-link" href="/questions">Ask Dr. Courtney a question <span aria-hidden="true">→</span></a>
+        <a class="text-link" href={resolve('/questions')}>Ask Dr. Courtney a question <span aria-hidden="true">→</span></a>
       </div>
     </div>
 
@@ -62,12 +73,12 @@
 </main>
 
 <footer>
-  <a class="wordmark" href="/">phases<span>.fm</span></a>
+  <a class="wordmark" href={resolve('/')}>phases<span>.fm</span></a>
   <p>Parenting changes. You don't have to figure it out alone.</p>
   <div>
-    <a href="/#episodes">Episodes</a>
-    <a href="/questions">Questions</a>
-    <a href="/#subscribe">Newsletter</a>
+    <a href={resolve('/#episodes')}>Episodes</a>
+    <a href={resolve('/questions')}>Questions</a>
+    <a href={resolve('/#subscribe')}>Newsletter</a>
   </div>
   <small>© {new Date().getFullYear()} Phases</small>
 </footer>

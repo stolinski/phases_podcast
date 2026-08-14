@@ -47,9 +47,18 @@
 </script>
 
 <svelte:head>
-  <meta property="og:title" content="Phases — A Parenting Podcast" />
+  <title>Phases — A Parenting Podcast with Dr. Courtney Tolinski</title>
+  <meta name="description" content="Research-backed parenting conversations with psychologist Dr. Courtney Tolinski and Scott Tolinski for every stage of raising kids and family life." />
+  <link rel="canonical" href="https://phases.fm" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phases.fm" />
+  <meta property="og:title" content="Phases — A Parenting Podcast with Dr. Courtney Tolinski" />
   <meta property="og:description" content="Research-backed parenting conversations with Dr. Courtney Tolinski and Scott Tolinski." />
   <meta property="og:image" content="https://phases.fm/artwork.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Phases — A Parenting Podcast with Dr. Courtney Tolinski" />
+  <meta name="twitter:description" content="Research-backed parenting conversations for every stage of family life." />
+  <meta name="twitter:image" content="https://phases.fm/artwork.jpg" />
 </svelte:head>
 
 <header class="site-header">

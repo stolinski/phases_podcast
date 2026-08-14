@@ -13,10 +13,18 @@
 </script>
 
 <svelte:head>
-  <title>Ask Dr. Courtney — Phases</title>
-  <meta name="description" content="Ask Dr. Courtney Tolinski your question about parenting, child development, learning, or neurodiversity." />
-  <meta property="og:title" content="Ask Dr. Courtney — Phases" />
+  <title>Ask Dr. Courtney Your Parenting Question — Phases</title>
+  <meta name="description" content="Ask psychologist Dr. Courtney Tolinski your question about parenting, child development, learning, or neurodiversity for a future Phases episode." />
+  <link rel="canonical" href="https://phases.fm/questions" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phases.fm/questions" />
+  <meta property="og:title" content="Ask Dr. Courtney Your Parenting Question — Phases" />
   <meta property="og:description" content="Send Dr. Courtney your parenting and child development questions for a future episode of Phases." />
+  <meta property="og:image" content="https://phases.fm/artwork.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Ask Dr. Courtney Your Parenting Question — Phases" />
+  <meta name="twitter:description" content="Send Dr. Courtney your parenting or child development question for a future episode." />
+  <meta name="twitter:image" content="https://phases.fm/artwork.jpg" />
 </svelte:head>
 
 <header class="site-header questions-header">
