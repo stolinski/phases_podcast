@@ -70,9 +70,9 @@
         <p>She currently co-hosts the podcast Phases.FM with her husband, professional podcaster Scott Tolinski, where they share insights on child psychology and the everyday challenges and joys of parenting.</p>
       </div>
       <div class="courtney-actions">
-        <a class="primary-button" href={resolve('/#episodes')}>
+        <a class="primary-button" href={resolve('/episodes/[slug]', { slug: '24-the-real-reason-your-child-falls-apart-after-school' })}>
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 7 8 5-8 5V7Z" fill="currentColor" /></svg>
-          Listen to Phases
+          Listen to an episode
         </a>
         <a class="text-link" href={resolve('/questions')}>Ask Dr. Courtney a question <span aria-hidden="true">→</span></a>
       </div>
