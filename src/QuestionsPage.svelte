@@ -59,12 +59,17 @@
 </header>
 
 <main class="questions-main">
-  <header class="questions-intro">
+  <div class="questions-intro">
     <a class="back-link" href={resolve('/')}><span aria-hidden="true">←</span> Back to Phases</a>
     <p class="eyebrow">Send us your question</p>
     <h1><span>Ask Dr.</span> <span>Courtney.</span></h1>
-    <p>Have a question about parenting, child development, learning, or neurodiversity? Send it our way and we may answer it on a future episode of Phases.</p>
-  </header>
+    <p class="questions-lede">Have a question about parenting, child development, learning, or neurodiversity? Send it our way and we may answer it on a future episode of Phases.</p>
+    <section class="question-topics" aria-labelledby="question-topics-title">
+      <h2 id="question-topics-title">Questions we explore</h2>
+      <p>Phases explores children’s behavior and emotions, learning and school, neurodiversity, developmental stages, family relationships, routines, and transitions. Selected listener questions become practical, research-backed conversations for parents navigating similar phases.</p>
+      <p>Before you submit, you can explore conversations about <a href={resolve('/episodes/[slug]', { slug: '24-the-real-reason-your-child-falls-apart-after-school' })}>after-school meltdowns</a>, <a href={resolve('/episodes/[slug]', { slug: '20-your-child-isn-t-lazy-it-may-be-executive-functioning' })}>executive functioning</a>, and <a href={resolve('/episodes/[slug]', { slug: '8-the-hidden-ways-anxiety-shows-up-in-childhood' })}>anxiety in kids</a>.</p>
+    </section>
+  </div>
 
   <section class="question-form" aria-labelledby="question-form-title">
     <h2 class="sr-only" id="question-form-title">Question submission form</h2>

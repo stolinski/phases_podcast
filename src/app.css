@@ -214,7 +214,11 @@ h1 em { color: var(--blue); font-style: normal; }
 .questions-intro .back-link { margin-bottom: 4rem; }
 .questions-intro h1 { font-size: clamp(3.5rem, 6vw, 6rem); }
 .questions-intro h1 span { display: block; }
-.questions-intro > p:last-child { max-width: 34rem; margin: 1.75rem 0 0; color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+.questions-intro .questions-lede { max-width: 34rem; margin: 1.75rem 0 0; color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+.question-topics { max-width: 34rem; margin-top: 2.25rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.question-topics h2 { font-size: 1.1rem; }
+.question-topics p { margin: .75rem 0 0; color: var(--muted); font-size: .88rem; line-height: 1.7; }
+.question-topics a { color: var(--deep-blue); font-weight: 600; text-underline-offset: .25em; }
 .question-form { padding: 1rem; overflow: hidden; border: 1px solid var(--line); border-radius: 1.5rem; background: var(--cream); box-shadow: 0 20px 55px rgba(23,50,70,.09); }
 .question-form iframe { display: block; width: 100%; min-height: 39.3125rem; border: 0; border-radius: .75rem; background: white; }
 .question-form > p { margin: .9rem .5rem .15rem; color: var(--muted); font-size: .72rem; text-align: center; }
