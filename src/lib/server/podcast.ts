@@ -2,8 +2,8 @@ import { XMLParser } from 'fast-xml-parser';
 import type { Episode, EpisodeNoteBlock, EpisodeResource } from '$lib/episodes';
 
 const FEED_URL = 'https://feeds.transistor.fm/phases-a-parenting-podcast-with-dr-courtney';
-const FRESH_CACHE_KEY = 'https://phases.fm/__cache/podcast-episodes-v3';
-const STALE_CACHE_KEY = 'https://phases.fm/__cache/podcast-episodes-stale-v3';
+const FRESH_CACHE_KEY = 'https://phases.fm/__cache/podcast-episodes-v4';
+const STALE_CACHE_KEY = 'https://phases.fm/__cache/podcast-episodes-stale-v4';
 const FRESH_TTL_SECONDS = 15 * 60;
 const STALE_TTL_SECONDS = 7 * 24 * 60 * 60;
 
@@ -65,8 +65,20 @@ function episodeNotes(value: unknown): EpisodeNoteBlock[] {
   for (const match of html.matchAll(/<(p|ul|ol)\b[^>]*>([\s\S]*?)<\/\1>/gi)) {
     const [, element, content] = match;
     if (element.toLowerCase() === 'p') {
-      const paragraph = cleanText(content);
-      if (paragraph) blocks.push({ type: 'paragraph', text: paragraph });
+      const lineItems = content
+        .split(/<br\s*\/?\s*>/gi)
+        .map(cleanText)
+        .filter(Boolean);
+      const previous = blocks.at(-1);
+      const followsListIntroducer = previous?.type === 'paragraph'
+        && /^(?:in this episode|topics? covered|what we cover|you(?:'|’)ll learn):$/i.test(previous.text);
+
+      if (followsListIntroducer && lineItems.length >= 3) {
+        blocks.push({ type: 'list', items: lineItems });
+      } else {
+        const paragraph = cleanText(content);
+        if (paragraph) blocks.push({ type: 'paragraph', text: paragraph });
+      }
       continue;
     }
 
