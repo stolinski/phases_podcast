@@ -12,7 +12,7 @@ const decode = (value = '') => value
   .replace(/&gt;/g, '>');
 const text = (html) => decode(html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
 const match = (html, pattern) => decode(html.match(pattern)?.[1]?.trim() ?? '');
-const metas = (html) => [...html.matchAll(/<meta\s+[^>]*(?:name|property)=["']([^"']+)["'][^>]*content=["']([^"']*)["'][^>]*>/gi)].reduce((all, item) => ({ ...all, [item[1].toLowerCase()]: decode(item[2]) }), {});
+const metas = (html) => [...html.matchAll(/<meta\s+[^>]*(?:name|property)=(["'])(.*?)\1[^>]*content=(["'])(.*?)\3[^>]*>/gi)].reduce((all, item) => ({ ...all, [item[2].toLowerCase()]: decode(item[4]) }), {});
 const links = (html) => [...html.matchAll(/<a\s+[^>]*href=["']([^"'#]+)(?:#[^"']*)?["'][^>]*>/gi)].map((item) => decode(item[1]));
 const schemas = (html) => [...html.matchAll(/<script\s+[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].map((item) => item[1]);
 const types = (value) => {
