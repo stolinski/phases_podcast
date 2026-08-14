@@ -1,5 +1,5 @@
 import { XMLParser } from 'fast-xml-parser';
-import type { Episode, EpisodeNoteBlock, EpisodeResource } from '$lib/episodes';
+import { episodeDescription, type Episode, type EpisodeNoteBlock, type EpisodeResource } from '$lib/episodes';
 
 const FEED_URL = 'https://feeds.transistor.fm/phases-a-parenting-podcast-with-dr-courtney';
 const FRESH_CACHE_KEY = 'https://phases.fm/__cache/podcast-episodes-v4';
@@ -92,14 +92,6 @@ function episodeNotes(value: unknown): EpisodeNoteBlock[] {
   return blocks.length ? blocks : [{ type: 'paragraph', text: fallback }];
 }
 
-function plainText(notes: EpisodeNoteBlock[]): string {
-  return notes
-    .flatMap((block) => block.type === 'paragraph' ? block.text : block.items)
-    .join(' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 function episodeResources(value: unknown): EpisodeResource[] {
   const resources: EpisodeResource[] = [];
   const seen = new Set<string>();
@@ -154,7 +146,7 @@ export function parseEpisodes(xml: string): Episode[] {
       id: text(item.guid),
       episode: Number(text(item['itunes:episode'] ?? item['podcast:episode'])),
       title: text(item['itunes:title'] ?? item.title).trim(),
-      description: plainText(notes),
+      description: episodeDescription(notes),
       notes,
       resources,
       date: date.toISOString(),

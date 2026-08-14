@@ -1,21 +1,22 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { episodeSlug, type Episode, type EpisodeReference } from '$lib/episodes';
+  import { episodeDescription, episodeSlug, type EpisodeDetail, type EpisodeReference } from '$lib/episodes';
 
   let {
     episode,
     newerEpisode,
     olderEpisode
   }: {
-    episode: Episode;
+    episode: EpisodeDetail;
     newerEpisode?: EpisodeReference;
     olderEpisode?: EpisodeReference;
   } = $props();
 
   const slug = $derived(episodeSlug(episode));
+  const description = $derived(episodeDescription(episode.notes));
   const canonicalUrl = $derived(`https://phases.fm/episodes/${slug}`);
   const pageTitle = $derived(truncate(`${episode.title} — Phases`, 65));
-  const metaDescription = $derived(truncate(episode.description, 165));
+  const metaDescription = $derived(truncate(description, 165));
   const schema = $derived({
     '@context': 'https://schema.org',
     '@graph': [
@@ -24,7 +25,7 @@
         '@id': `${canonicalUrl}#episode`,
         name: episode.title,
         url: canonicalUrl,
-        description: episode.description,
+        description,
         datePublished: episode.date,
         duration: isoDuration(episode.duration),
         episodeNumber: episode.episode,

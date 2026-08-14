@@ -21,10 +21,19 @@ export type Episode = {
 };
 
 export type EpisodeReference = Pick<Episode, 'episode' | 'title'>;
+export type EpisodeDetail = Omit<Episode, 'description'>;
 export type EpisodeListing = Pick<
   Episode,
   'id' | 'episode' | 'title' | 'description' | 'date' | 'audio' | 'duration'
 >;
+
+export function episodeDescription(notes: EpisodeNoteBlock[]): string {
+  return notes
+    .flatMap((block) => block.type === 'paragraph' ? block.text : block.items)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 export function episodeSlug(episode: Pick<Episode, 'episode' | 'title'>): string {
   const title = episode.title
