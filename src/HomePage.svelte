@@ -85,6 +85,7 @@
 </script>
 
 <svelte:head>
+  <script src="https://f.convertkit.com/ckjs/ck.5.js" defer></script>
   <title>Phases — A Parenting Podcast with Dr. Courtney Tolinski</title>
   <meta name="description" content="Research-backed parenting conversations with psychologist Dr. Courtney Tolinski and Scott Tolinski for every stage of raising kids and family life." />
   <link rel="canonical" href="https://phases.fm" />
