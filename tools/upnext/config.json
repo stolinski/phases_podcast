@@ -1,14 +1,13 @@
 {
-  "watchDir": "~/Documents/phases/upnext",
-  "projectsDir": "~/Documents/phases/projects",
-  "lockPath": "~/Documents/phases/.upnext.lock",
+  "phasesDir": "~/Documents/phases",
+  "inboxDir": "upnext",
+  "episodesDir": "episodes",
+  "episodeFolderName": "{prefix}{next}",
   "settleSeconds": 30,
   "pollSeconds": 5,
   "idleExitSeconds": 120,
   "maxWaitMinutes": 180,
   "allowExtraFiles": true,
-  "ignore": [".*", "Icon\r", "*.icloud"],
-  "inProgress": ["*.download", "*.crdownload", "*.part", "*.partial", "*.opdownload", "*.tmp"],
   "requiredMedia": [
     {
       "id": "courtney",
@@ -26,24 +25,21 @@
     }
   ],
   "probe": true,
-  "ffprobeBin": "ffprobe",
   "notify": true,
+  "resolve": {
+    "enabled": true,
+    "required": true,
+    "appName": "DaVinci Resolve",
+    "processName": "Resolve",
+    "launchTimeoutSeconds": 120,
+    "readyDelaySeconds": 20
+  },
   "claude": {
     "bin": "claude",
+    "skill": null,
     "promptTemplate": "./prompt.md",
     "permissionMode": "acceptEdits",
-    "allowedTools": [
-      "Read",
-      "Write",
-      "Edit",
-      "Glob",
-      "Grep",
-      "Bash(ffprobe *)",
-      "Bash(ffmpeg *)",
-      "Bash(ls *)",
-      "Bash(mkdir *)",
-      "Bash(du *)"
-    ],
+    "allowedTools": [],
     "model": null,
     "effort": null,
     "maxBudgetUsd": null,

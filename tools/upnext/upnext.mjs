@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Phases upnext watcher CLI. See tools/upnext/README.md.
+// Phases inbox watcher CLI. See tools/upnext/README.md.
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -7,41 +7,31 @@ import fsp from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  DEFAULT_CONFIG_PATH,
-  LAUNCHD_LABEL,
-  acquireLock,
-  claimBatch,
-  describeEvaluation,
-  evaluate,
-  formatBytes,
-  launchdPath,
-  launchdPlist,
-  loadConfig,
-  notify,
-  readManifest,
-  resolveBin,
-  runClaude,
-  scanWatchDir,
-  waitUntilReady
-} from './lib.mjs';
+import { startEdit } from './lib/claude.mjs';
+import { DEFAULT_CONFIG_PATH, loadConfig } from './lib/config.mjs';
+import { formatFindings, runDoctor } from './lib/doctor.mjs';
+import { claimEpisode, planEpisode, readManifest } from './lib/episodes.mjs';
+import { describeEvaluation, evaluate, scanInbox, waitUntilReady } from './lib/inbox.mjs';
+import { LAUNCHD_LABEL, acquireLock, formatBytes, launchdPath, launchdPlist, notify, resolveBin } from './lib/system.mjs';
 
 const USAGE = `Usage: node tools/upnext/upnext.mjs <command> [options]
 
 Commands:
-  status                 Show which required media are present, missing, or still copying
-  check                  One-shot: wait for the set to settle, claim it, run Claude Code
-  watch                  Keep watching upnext (FSEvents) and run "check" on every change
-  rerun <projectDir>     Run Claude Code again for an already-claimed project
-  launchd print          Print the LaunchAgent plist (WatchPaths, no resident process)
-  launchd install        Install and load the LaunchAgent for this config
+  doctor                 Check this Mac: Phases, inbox and episodes folders, skills, Claude Code, DaVinci Resolve
+  status                 Show which required media are in the inbox, missing, or still copying
+  check                  One-shot: wait for the set to settle, move it into its episode folder, open Resolve, start the edit
+  watch                  Keep watching the inbox from a terminal and run "check" on every change
+  rerun <episodeDir>     Start the edit again for an episode the watcher already handed off
+  launchd print          Print the LaunchAgent plist
+  launchd install        Run doctor, then install and load the LaunchAgent
   launchd uninstall      Unload and remove the LaunchAgent
 
 Options:
   --config <path>        Config file (default: tools/upnext/config.json, or $PHASES_UPNEXT_CONFIG)
   --now                  Skip the settle window (check/watch)
-  --dry-run              Report what would happen without moving media or running Claude
-  --json                 Machine-readable status output`;
+  --dry-run              Report what would happen without moving media or starting anything
+  --force                Install the LaunchAgent even if doctor reports a failure
+  --json                 Machine-readable output (status, doctor)`;
 
 /** @param {string} message */
 function log(message) {
@@ -51,12 +41,12 @@ function log(message) {
 
 /** @param {string[]} argv */
 function parseArgs(argv) {
-  /** @type {{ positionals: string[], config: string, now: boolean, dryRun: boolean, json: boolean }} */
   const options = {
-    positionals: [],
+    positionals: /** @type {string[]} */ ([]),
     config: process.env.PHASES_UPNEXT_CONFIG || DEFAULT_CONFIG_PATH,
     now: false,
     dryRun: false,
+    force: false,
     json: false
   };
   for (let i = 0; i < argv.length; i += 1) {
@@ -65,6 +55,7 @@ function parseArgs(argv) {
     else if (arg.startsWith('--config=')) options.config = arg.slice('--config='.length);
     else if (arg === '--now') options.now = true;
     else if (arg === '--dry-run') options.dryRun = true;
+    else if (arg === '--force') options.force = true;
     else if (arg === '--json') options.json = true;
     else if (arg === '-h' || arg === '--help') options.positionals.unshift('help');
     else if (arg.startsWith('-')) throw new Error(`Unknown option ${arg}`);
@@ -74,21 +65,21 @@ function parseArgs(argv) {
   return options;
 }
 
-/** @param {unknown} error @param {import('./lib.mjs').Config} config */
+/** @param {unknown} error @param {import('./lib/config.mjs').Config} config */
 function explain(error, config) {
   const err = /** @type {NodeJS.ErrnoException} */ (error);
   if (err?.code === 'EPERM' || err?.code === 'EACCES') {
-    return `${err.message}\nmacOS privacy controls blocked access to ${config.watchDir}. Grant "${process.execPath}" access to the Documents folder (System Settings > Privacy & Security > Files and Folders, or Full Disk Access), or run "watch" from a terminal that already has access.`;
+    return `${err.message}\nmacOS privacy controls blocked access to ${config.phasesDir}. Give ${process.execPath} access to the Documents folder (System Settings > Privacy & Security > Files and Folders, or Full Disk Access), or run "watch" from a terminal that already has access.`;
   }
-  return err?.stack ?? String(error);
+  return err instanceof Error ? err.message : String(error);
 }
 
 /**
- * Settle, claim, and edit every complete batch in upnext. Returns an exit code.
- * @param {import('./lib.mjs').Config} config
+ * Settle, move, and start the edit for every complete set in the inbox.
+ * @param {import('./lib/config.mjs').Config} config
  * @param {{ now: boolean, dryRun: boolean }} options
  */
-async function processPending(config, options) {
+async function processInbox(config, options) {
   const release = options.dryRun ? () => {} : acquireLock(config.lockPath);
   if (!release) {
     log('another upnext run is active (lock held); skipping');
@@ -99,8 +90,8 @@ async function processPending(config, options) {
     for (;;) {
       const outcome = await waitUntilReady(config, { settleMs: options.now ? 0 : undefined, log });
       if (outcome.status === 'missing-dir') {
-        log(`watch folder ${config.watchDir} does not exist yet; create it or run "watch"`);
-        return exitCode;
+        log(`inbox ${config.inboxDir} does not exist; run "doctor" and set inboxDir in the config`);
+        return 1;
       }
       if (outcome.status === 'empty') return exitCode;
       if (outcome.status === 'incomplete') {
@@ -109,29 +100,31 @@ async function processPending(config, options) {
         return exitCode;
       }
       if (outcome.status === 'timeout') {
-        log('gave up waiting for media to finish copying; the next change will re-check');
+        log('gave up waiting for media to finish copying; the next change will check again');
         return 2;
       }
       const { scan, evaluation } = outcome;
       if (!scan || !evaluation) return exitCode;
+
       if (options.dryRun) {
-        log(`dry run: would claim ${scan.topLevel.join(', ')} into ${config.projectsDir} and start Claude Code`);
+        const plan = await planEpisode(scan, config);
+        log(`dry run: would move ${scan.topLevel.join(', ')} into ${plan.dir}${plan.exists ? ' (existing folder)' : ''}, make sure ${config.resolve.appName} is open, and start the edit`);
         return exitCode;
       }
 
-      const manifest = await claimBatch(scan, evaluation, config);
-      log(`claimed media into ${manifest.projectDir}`);
-      notify('Phases upnext', `Media complete. Claude Code is editing ${manifest.batchId}.`, config);
-      const run = await runClaude(manifest, config, { log });
+      const manifest = await claimEpisode(scan, evaluation, config);
+      log(`moved media into ${manifest.episodeDir}`);
+      notify('Phases', `Media complete. Starting the edit for ${manifest.episodeName}.`, config);
+      const run = await startEdit(manifest, config, { log });
       if (run.status === 'succeeded') {
-        const cost = typeof run.costUsd === 'number' ? ` ($${run.costUsd.toFixed(2)})` : '';
-        log(`Claude Code finished ${manifest.batchId}${cost}; outputs in ${manifest.outputDir}`);
-        if (run.sessionId) log(`resume interactively: cd "${manifest.projectDir}" && claude --resume ${run.sessionId}`);
-        notify('Phases upnext', `Edit finished for ${manifest.batchId}.`, config);
+        const cost = typeof run.costUsd === 'number' ? ` (reported $${run.costUsd.toFixed(2)})` : '';
+        log(`edit run finished for ${manifest.episodeName}${cost}`);
+        if (run.sessionId) log(`continue it interactively: cd "${config.phasesDir}" && claude --resume ${run.sessionId}`);
+        notify('Phases', `Edit run finished for ${manifest.episodeName}.`, config);
       } else {
         exitCode = 1;
-        log(`Claude Code failed for ${manifest.batchId} (${run.error ?? `exit ${run.exitCode}`}); see ${manifest.projectDir}. Retry with: npm run upnext -- rerun "${manifest.projectDir}"`);
-        notify('Phases upnext', `Edit failed for ${manifest.batchId}. Check the project log.`, config);
+        log(`edit did not finish for ${manifest.episodeName} (${run.error}). Retry with: npm run upnext -- rerun "${manifest.episodeDir}"`);
+        notify('Phases', `Edit did not finish for ${manifest.episodeName}. Check the log.`, config);
       }
     }
   } finally {
@@ -139,51 +132,56 @@ async function processPending(config, options) {
   }
 }
 
-/** @param {import('./lib.mjs').Config} config @param {{ json: boolean }} options */
+/** @param {import('./lib/config.mjs').Config} config @param {{ json: boolean }} options */
 async function status(config, options) {
-  const scan = await scanWatchDir(config);
+  const scan = await scanInbox(config);
   const evaluation = evaluate(scan, config);
   if (options.json) {
-    console.log(
-      JSON.stringify(
-        {
-          watchDir: config.watchDir,
-          exists: scan.exists,
-          ready: scan.exists && evaluation.ready,
-          roles: evaluation.roles.map(({ role, files }) => ({
-            id: role.id,
-            label: role.label,
-            min: role.min,
-            files: files.map((f) => ({ path: f.rel, size: f.size, busy: f.busy }))
-          })),
-          missing: evaluation.missing.map((role) => role.id),
-          extras: evaluation.extras.map((f) => f.rel),
-          busy: evaluation.busy
-        },
-        null,
-        2
-      )
-    );
+    const roles = evaluation.roles.map(({ role, files }) => ({
+      id: role.id,
+      label: role.label,
+      min: role.min,
+      files: files.map((f) => ({ path: f.rel, size: f.size, busy: f.busy }))
+    }));
+    const summary = {
+      inboxDir: config.inboxDir,
+      exists: scan.exists,
+      ready: scan.exists && evaluation.ready,
+      roles,
+      missing: evaluation.missing.map((role) => role.id),
+      extras: evaluation.extras.map((f) => f.rel),
+      busy: evaluation.busy
+    };
+    console.log(JSON.stringify(summary, null, 2));
     return 0;
   }
-  console.log(`watch folder: ${config.watchDir}${scan.exists ? '' : ' (missing)'}`);
+  console.log(`inbox: ${config.inboxDir}${scan.exists ? '' : ' (missing)'}`);
   for (const { role, files } of evaluation.roles) {
-    const ok = files.length >= role.min;
     const detail = files.length
       ? files.map((f) => `${f.rel} (${formatBytes(f.size)}${f.busy ? `, ${f.busy}` : ''})`).join(', ')
       : `missing (need ${role.min})`;
-    console.log(`  ${ok ? '✓' : '✗'} ${role.label}: ${detail}`);
+    console.log(`  ${files.length >= role.min ? '✓' : '✗'} ${role.label}: ${detail}`);
   }
   for (const file of evaluation.extras) console.log(`  + extra: ${file.rel} (${formatBytes(file.size)})`);
-  for (const busy of scan.inProgress) console.log(`  … downloading: ${busy}`);
+  for (const rel of scan.inProgress) console.log(`  … downloading: ${rel}`);
   console.log(describeEvaluation(evaluation));
   return 0;
 }
 
-/** @param {import('./lib.mjs').Config} config @param {{ now: boolean, dryRun: boolean }} options */
+/** @param {import('./lib/config.mjs').Config} config @param {{ json: boolean }} options */
+async function doctor(config, options) {
+  const findings = await runDoctor(config);
+  console.log(options.json ? JSON.stringify(findings, null, 2) : formatFindings(findings));
+  return findings.some((f) => f.level === 'fail') ? 1 : 0;
+}
+
+/** @param {import('./lib/config.mjs').Config} config @param {{ now: boolean, dryRun: boolean }} options */
 async function watch(config, options) {
-  await fsp.mkdir(config.watchDir, { recursive: true });
-  log(`watching ${config.watchDir} (Ctrl-C to stop)`);
+  if (!fs.existsSync(config.inboxDir)) {
+    log(`inbox ${config.inboxDir} does not exist; run "doctor" and set inboxDir in the config`);
+    return 1;
+  }
+  log(`watching ${config.inboxDir} (Ctrl-C to stop)`);
   let running = false;
   let again = false;
   /** @type {NodeJS.Timeout | undefined} */
@@ -199,7 +197,7 @@ async function watch(config, options) {
     }
     running = true;
     try {
-      await processPending(config, options);
+      await processInbox(config, options);
     } catch (error) {
       log(`error: ${explain(error, config)}`);
     } finally {
@@ -210,12 +208,12 @@ async function watch(config, options) {
       }
     }
   };
-  const watcher = fs.watch(config.watchDir, { recursive: true }, schedule);
+  const watcher = fs.watch(config.inboxDir, { recursive: true }, schedule);
   watcher.on('error', (error) => {
     log(`watcher stopped: ${explain(error, config)}`);
     process.exit(1);
   });
-  // Safety net in case an FSEvents notification is ever dropped.
+  // Safety net in case a file system notification is ever dropped.
   setInterval(schedule, 15 * 60_000).unref();
   const stop = () => {
     watcher.close();
@@ -227,26 +225,26 @@ async function watch(config, options) {
   return new Promise(() => {});
 }
 
-/** @param {import('./lib.mjs').Config} config @param {string | undefined} projectDir */
-async function rerun(config, projectDir) {
-  if (!projectDir) throw new Error('rerun needs the project folder path');
-  const manifest = await readManifest(path.resolve(projectDir));
+/** @param {import('./lib/config.mjs').Config} config @param {string | undefined} episodeDir */
+async function rerun(config, episodeDir) {
+  if (!episodeDir) throw new Error('rerun needs the episode folder path');
+  const manifest = await readManifest(path.resolve(episodeDir));
   const release = acquireLock(config.lockPath);
   if (!release) {
     log('another upnext run is active (lock held); try again when it finishes');
     return 1;
   }
   try {
-    const run = await runClaude(manifest, config, { log });
-    log(`run ${run.run} ${run.status}${run.sessionId ? ` (session ${run.sessionId})` : ''}`);
+    const run = await startEdit(manifest, config, { log });
+    log(`run ${run.run} ${run.status}${run.error ? ` (${run.error})` : ''}${run.sessionId ? `, session ${run.sessionId}` : ''}`);
     return run.status === 'succeeded' ? 0 : 1;
   } finally {
     release();
   }
 }
 
-/** @param {import('./lib.mjs').Config} config @param {string | undefined} action */
-async function launchd(config, action) {
+/** @param {import('./lib/config.mjs').Config} config @param {string | undefined} action @param {{ force: boolean }} options */
+async function launchd(config, action, options) {
   const home = os.homedir();
   const plistPath = path.join(home, 'Library/LaunchAgents', `${LAUNCHD_LABEL}.plist`);
   const domain = `gui/${process.getuid?.() ?? ''}`;
@@ -254,7 +252,7 @@ async function launchd(config, action) {
     nodePath: resolveBin('node') ?? process.execPath,
     scriptPath: fileURLToPath(import.meta.url),
     configPath: config.configPath ?? DEFAULT_CONFIG_PATH,
-    watchDir: config.watchDir,
+    inboxDir: config.inboxDir,
     logPath: path.join(home, 'Library/Logs/phases-upnext.log'),
     pathEnv: launchdPath(home)
   });
@@ -264,13 +262,18 @@ async function launchd(config, action) {
     return 0;
   }
   if (action === 'install') {
-    await fsp.mkdir(config.watchDir, { recursive: true });
+    const findings = await runDoctor(config);
+    console.log(formatFindings(findings));
+    if (findings.some((f) => f.level === 'fail') && !options.force) {
+      log('not installing: fix the ✗ items above (or pass --force)');
+      return 1;
+    }
     await fsp.mkdir(path.dirname(plistPath), { recursive: true });
     await fsp.writeFile(plistPath, xml);
     spawnSync('launchctl', ['bootout', `${domain}/${LAUNCHD_LABEL}`], { stdio: 'ignore' });
     const result = spawnSync('launchctl', ['bootstrap', domain, plistPath], { stdio: 'inherit' });
     if (result.status !== 0) return result.status ?? 1;
-    log(`installed ${LAUNCHD_LABEL}; it runs when ${config.watchDir} changes. Log: ~/Library/Logs/phases-upnext.log`);
+    log(`installed ${LAUNCHD_LABEL}; it runs when ${config.inboxDir} changes. Log: ~/Library/Logs/phases-upnext.log`);
     return 0;
   }
   if (action === 'uninstall') {
@@ -293,16 +296,18 @@ async function main() {
   const config = loadConfig(options.config);
   try {
     switch (command) {
+      case 'doctor':
+        return await doctor(config, options);
       case 'status':
         return await status(config, options);
       case 'check':
-        return await processPending(config, options);
+        return await processInbox(config, options);
       case 'watch':
         return await watch(config, options);
       case 'rerun':
         return await rerun(config, arg);
       case 'launchd':
-        return await launchd(config, arg);
+        return await launchd(config, arg, options);
       default:
         console.error(`Unknown command "${command}"\n\n${USAGE}`);
         return 64;

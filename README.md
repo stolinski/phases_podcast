@@ -22,4 +22,4 @@ Cloudflare Pages configuration lives in `wrangler.toml`; the server-rendered bui
 
 ## Episode editing hand-off
 
-`tools/upnext` watches `~/Documents/phases/upnext`. Once every required media file for an episode is present and finished copying, it moves the set into an episode project folder and runs Claude Code headlessly to edit it. Run `npm run upnext:watch`, or install the LaunchAgent with `npm run upnext -- launchd install`. See [tools/upnext/README.md](tools/upnext/README.md).
+`tools/upnext` runs on the MacBook Pro that edits Phases. When every required media file for an episode has finished arriving in the Phases inbox, it moves the set into the normal episodes folder, opens DaVinci Resolve if it isn't running, and starts Claude Code from the Phases folder so its editing skills do the edit. Start with `npm run upnext -- doctor`, then `npm run upnext -- launchd install`. See [tools/upnext/README.md](tools/upnext/README.md).

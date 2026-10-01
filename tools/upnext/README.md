@@ -1,59 +1,64 @@
-# Phases upnext watcher
+# Phases inbox watcher
 
-Drop an episode's media into `~/Documents/phases/upnext`. When every required file is present and has finished copying, the watcher moves the set into a new episode project folder and starts Claude Code headlessly to edit it.
+Runs on the Mac that edits Phases (Scott's MacBook Pro), against the existing Phases folder in Documents. It uses only local folders; nothing involves iCloud.
+
+When every required media file is in the inbox and has finished copying, the watcher:
+
+1. moves the set into the normal episodes folder,
+2. opens DaVinci Resolve if it is not already running (a running Resolve is left alone), and
+3. starts Claude Code from the Phases folder, so that folder's `CLAUDE.md`, skills, and permission rules drive the edit the way they normally do.
 
 ```
 ~/Documents/phases/
-  upnext/                      drop media here
-  projects/<YYYY-MM-DD-HHMMSS>/
-    media/                     the claimed originals (Claude treats them as read-only)
-    edit/                      everything Claude produces
-    upnext.json                manifest: roles, sizes, ffprobe data, run history
-    prompt.md                  the exact prompt Claude received
-    claude-settings.json       tool permissions passed with --settings
-    claude-run-N.jsonl         stream-json log of run N (tail -f to follow)
+  upnext/                        inbox (inboxDir)
+  episodes/                      normal episodes folder (episodesDir)
+    Episode 25/                  media lands here
+      .upnext/                   hand-off record, prompt, and Claude logs
+  .claude/skills/…               the editing skills Claude uses
 ```
 
-## Use it
+## Set up on the MacBook Pro
 
 ```bash
-npm run upnext -- status            # what's present, missing, or still copying
-npm run upnext:watch                # watch from a terminal (FSEvents, idle between events)
-npm run upnext -- check --dry-run   # what the next hand-off would do, without doing it
-npm run upnext -- rerun ~/Documents/phases/projects/<batch>   # retry a failed or unsatisfying edit
-npm run test:upnext
+git pull                          # in the Phases repo checkout
+npm run upnext -- doctor          # checks folders, skills, Claude Code, folder trust, Resolve
 ```
 
-To run unattended without a terminal open, install the LaunchAgent. It uses launchd `WatchPaths`, so no process stays running: launchd starts a short `check` when the folder changes, plus a cheap safety-net check every 15 minutes.
+`doctor` only reads. It lists the Phases folder's skills, shows which folder the next episode would go into, and flags anything missing. Adjust `tools/upnext/config.json` until it is clean:
+
+- `inboxDir`, `episodesDir`: folder names inside `phasesDir` (or absolute paths). The watcher never creates them.
+- `claude.skill`: the editing skill to run, for example `"edit-episode"`. The prompt then starts with `/edit-episode`. Left `null`, Claude picks the editing skill from the folder's skill descriptions.
+- `requiredMedia`: what makes a set complete (see below).
+- `episodeFolderName`: name for loose files. `{prefix}{next}` continues the existing numbering, so after `Episode 24 - Sleep` comes `Episode 25`. `{date}` is also available. A single folder dropped into the inbox keeps its own name instead, and if an episode folder with that name already exists, the media is added to it (any name clash stops the move before anything changes).
+
+Then install the LaunchAgent. It uses launchd `WatchPaths`, so no process stays running between changes:
 
 ```bash
-npm run upnext -- launchd print      # review the plist first
-npm run upnext -- launchd install    # writes ~/Library/LaunchAgents/fm.phases.upnext.plist and loads it
-npm run upnext -- launchd uninstall
+npm run upnext -- launchd install     # runs doctor first; refuses if anything fails
 tail -f ~/Library/Logs/phases-upnext.log
+npm run upnext -- launchd uninstall
 ```
 
-macOS protects `~/Documents`. A terminal that can already read Documents works immediately with `watch`. The LaunchAgent runs `node` directly, so give the node binary Documents access (or Full Disk Access) in System Settings > Privacy & Security if the log shows `EPERM`.
+macOS protects Documents. The LaunchAgent runs `node` directly, so give that node binary Documents access (System Settings > Privacy & Security > Files and Folders, or Full Disk Access) if the log shows `EPERM`. Alternatively run `npm run upnext:watch` in a terminal that already has access.
 
-## When is a set "complete"?
+Open Claude Code in the Phases folder once and accept the trust prompt if `doctor` warns about folder trust; until then Claude ignores that folder's permission rules in unattended runs.
 
-`config.json` → `requiredMedia` lists the media roles. Each role matches file names with case-insensitive globs (`match`) and/or `extensions`, and needs at least `min` files (optional `max`). A file fills the first role it matches. Files that match no role are carried along as extras unless `allowExtraFiles` is `false`, in which case they block the hand-off.
+## Day to day
 
-Shipped defaults require one Dr. Courtney track (`*courtney*`) and one Scott track (`*scott*`), each audio or video. Add roles such as a guest track, a wide camera, or music beds as the workflow needs.
+```bash
+npm run upnext -- status                              # what's in the inbox, missing, or still copying
+npm run upnext -- check --dry-run                     # where the next set would go, without moving anything
+npm run upnext -- rerun ~/Documents/phases/episodes/"Episode 25"   # start the edit again
+```
 
-Before handing off, the watcher also requires that:
+Claude runs headless (`claude -p`) with `--permission-prompts none`, so anything the Phases folder's permission rules do not allow is denied instead of waiting for someone. The log prints a `claude --resume <session>` command to pick the session up interactively. `claude.allowedTools` adds extra allow rules, and `claude.model`, `claude.effort`, and `claude.maxBudgetUsd` are passed through when set.
 
-- nothing is still downloading (`*.download`, `*.crdownload`, `*.part`, …) and no file is empty or mid-Finder-copy;
-- nothing has changed for `settleSeconds` (default 30), measured from the newest file change, so media that finished copying earlier is handed off immediately.
+If Resolve cannot be opened, Claude is not started (`resolve.required`); the media stays in its episode folder and `rerun` starts the edit later. `resolve.readyDelaySeconds` gives a freshly opened Resolve time to load before the edit starts.
 
-Hidden files (`.DS_Store`, iCloud placeholders) are ignored. Media can be dropped loose or inside a folder.
+## When is a set complete?
 
-If the set is incomplete, the watcher exits after `idleExitSeconds` without changes and checks again on the next change. Moving the media out of `upnext` claims it, so the same set is never edited twice and the folder is ready for the next episode. A lock file keeps the terminal watcher and the LaunchAgent from running at the same time.
+`requiredMedia` lists media roles. Each role matches file names with case-insensitive globs (`match`) and/or `extensions`, and needs at least `min` files (optional `max`). The shipped roles are one Dr. Courtney track (`*courtney*`) and one Scott track (`*scott*`); change them to match how episodes are actually recorded. Other files ride along unless `allowExtraFiles` is `false`.
 
-## What Claude does
+The watcher also waits until nothing is still downloading (`*.download`, `*.crdownload`, `*.part`, …), no file is empty or mid-Finder-copy, and nothing has changed for `settleSeconds` (default 30). Hidden files are ignored. An incomplete set is left in the inbox and checked again on the next change. A lock file in `~/Library/Caches` keeps two runs from overlapping.
 
-`prompt.md` is the edit brief. It is a template with `{{batchId}}`, `{{projectDir}}`, `{{mediaDir}}`, `{{outputDir}}`, `{{manifestPath}}`, and `{{mediaList}}`; unknown placeholders fail loudly. The default brief syncs the host tracks, renders a loudness-normalized rough mix, proposes (but does not apply) content cuts, and writes `edit/EDIT-NOTES.md`.
-
-Claude Code runs with `claude -p` inside the project folder, the prompt on stdin, `--permission-mode acceptEdits`, and `--permission-prompts none`, so anything not allowed by `claude.allowedTools` is denied instead of waiting for a person. Set `claude.model`, `claude.effort`, or `claude.maxBudgetUsd` to pin the model, effort, or a per-run spend cap. After a run, the log prints a `claude --resume <session>` command to continue the edit interactively.
-
-Use `--config <path>` or `PHASES_UPNEXT_CONFIG` to point at a different config; relative paths in a config resolve from that config's folder.
+`npm run test:upnext` runs the tests with fake Claude Code and Resolve.
