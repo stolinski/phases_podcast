@@ -1,0 +1,52 @@
+{
+  "watchDir": "~/Documents/phases/upnext",
+  "projectsDir": "~/Documents/phases/projects",
+  "lockPath": "~/Documents/phases/.upnext.lock",
+  "settleSeconds": 30,
+  "pollSeconds": 5,
+  "idleExitSeconds": 120,
+  "maxWaitMinutes": 180,
+  "allowExtraFiles": true,
+  "ignore": [".*", "Icon\r", "*.icloud"],
+  "inProgress": ["*.download", "*.crdownload", "*.part", "*.partial", "*.opdownload", "*.tmp"],
+  "requiredMedia": [
+    {
+      "id": "courtney",
+      "label": "Dr. Courtney's track",
+      "match": ["*courtney*"],
+      "extensions": ["wav", "aif", "aiff", "flac", "m4a", "mp3", "mov", "mp4", "m4v", "mkv"],
+      "min": 1
+    },
+    {
+      "id": "scott",
+      "label": "Scott's track",
+      "match": ["*scott*"],
+      "extensions": ["wav", "aif", "aiff", "flac", "m4a", "mp3", "mov", "mp4", "m4v", "mkv"],
+      "min": 1
+    }
+  ],
+  "probe": true,
+  "ffprobeBin": "ffprobe",
+  "notify": true,
+  "claude": {
+    "bin": "claude",
+    "promptTemplate": "./prompt.md",
+    "permissionMode": "acceptEdits",
+    "allowedTools": [
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "Bash(ffprobe *)",
+      "Bash(ffmpeg *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(du *)"
+    ],
+    "model": null,
+    "effort": null,
+    "maxBudgetUsd": null,
+    "extraArgs": []
+  }
+}

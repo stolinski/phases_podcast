@@ -8,6 +8,9 @@
     "build": "vite build",
     "preview": "wrangler pages dev .svelte-kit/cloudflare",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "upnext": "node tools/upnext/upnext.mjs",
+    "upnext:watch": "node tools/upnext/upnext.mjs watch",
+    "test:upnext": "node --test tools/upnext/",
     "prepare": "svelte-kit sync"
   },
   "devDependencies": {

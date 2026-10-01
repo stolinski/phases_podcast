@@ -19,3 +19,7 @@ npm run build
 Episodes are fetched from the official Transistor RSS feed in the server-only homepage load. Successful responses are cached at the Cloudflare edge for 15 minutes, with a seven-day stale cache used when Transistor is temporarily unavailable. Publishing an episode does not require a source change or rebuild.
 
 Cloudflare Pages configuration lives in `wrangler.toml`; the server-rendered build output is `.svelte-kit/cloudflare`.
+
+## Episode editing hand-off
+
+`tools/upnext` watches `~/Documents/phases/upnext`. Once every required media file for an episode is present and finished copying, it moves the set into an episode project folder and runs Claude Code headlessly to edit it. Run `npm run upnext:watch`, or install the LaunchAgent with `npm run upnext -- launchd install`. See [tools/upnext/README.md](tools/upnext/README.md).
